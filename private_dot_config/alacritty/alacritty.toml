@@ -4,3 +4,19 @@ size = 14.0
 [font.normal]
 family = "Terminus"
 style = "Regular"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"
+
+# Copy/Paste for Russian layout (physical C=с, physical V=м)
+[[keyboard.bindings]]
+key = "с"
+mods = "Control|Shift"
+action = "Copy"
+
+[[keyboard.bindings]]
+key = "м"
+mods = "Control|Shift"
+action = "Paste"

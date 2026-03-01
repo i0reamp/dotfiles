@@ -50,7 +50,7 @@
 #waybar {
     background-color: #222222; /* Sway palette: unfocused/background */
     color: #ffffff; /* Sway palette: focused/text */
-    font-family: Terminus, FontAwesome, system-ui, sans-serif;
+    font-family: Terminus, FontAwesome, "NotoSans Nerd Font", system-ui, sans-serif;
     font-size: 14px;
 }
 
@@ -220,3 +220,6 @@
 
 #custom-vpn.connected     { color: #32cd32; }   /* зелёный */
 #custom-vpn.disconnected  { color: #ff5555; }   /* красный */
+
+#custom-proxy.on          { color: #32cd32; margin-left: 10px; margin-right: 4px; }
+#custom-proxy.off         { color: #888888; margin-left: 10px; margin-right: 4px; }

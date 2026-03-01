@@ -3,3 +3,6 @@ if status is-interactive
 end
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
+
+set -gx EDITOR nvim
+set -gx VISUAL nvim

@@ -1,0 +1,7 @@
+[Unit]
+Description=Change wallpaper from Unsplash
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/wallpaper/change.sh
+Environment=SWAYSOCK=%t/sway-ipc.%u.sock
