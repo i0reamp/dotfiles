@@ -7,7 +7,7 @@ return {
       ---@type lspconfig.options
       servers = {
         bashls = {
-          filetypes = { "sh", "zsh" },
+          filetypes = { "sh", "zsh", "fish" },
         },
       },
     },
