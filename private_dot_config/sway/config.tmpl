@@ -15,7 +15,7 @@ set $term alacritty
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
 # set $menu dmenu_path | dmenu | xargs swaymsg exec --
-set $menu rofi -show run
+set $menu rofi -show drun
 
 font pango:Terminus Regular 12 
 
@@ -25,6 +25,7 @@ font pango:Terminus Regular 12
 # output * bg ~/personal/guix-config/config/wallpaper/0001.svg fill
 # output * bg ~/personal/guix-config/config/wallpaper/z.jpg fill
 #output * bg ~/personal/guix-config/config/wallpaper/bbc.jpg fill
+exec ~/.config/sway/scripts/wallpaper.sh
 #
 # Example configuration:
 #
@@ -207,7 +208,10 @@ bindsym --to-code $mod+n exec foot --app-id=launcher-nmtui -e nmtui-connect
 bindsym --to-code $mod+g exec firefox
 
 # telegram
-bindsym --to-code $mod+t exec telegram-desktop
+bindsym --to-code $mod+t exec flatpak run org.telegram.desktop
+
+# wallpaper
+bindsym --to-code $mod+Shift+w exec ~/.config/sway/scripts/wallpaper.sh
 
 # Brightness (laptop only)
 bindsym --to-code XF86MonBrightnessUp exec --no-startup-id brightnessctl set +10%

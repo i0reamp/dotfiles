@@ -1,0 +1,11 @@
+configuration {
+    modi: "run,drun,window";
+    show-icons: true;
+    font: "Terminus 18";
+    drun-display-format: "{name}";
+    display-run: "";
+    display-drun: "";
+    display-window: "";
+}
+
+@theme "sway-dark"

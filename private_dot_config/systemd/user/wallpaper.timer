@@ -1,8 +1,8 @@
 [Unit]
-Description=Change wallpaper every 30 minutes
+Description=Change wallpaper every 15 minutes
 
 [Timer]
-OnCalendar=*:0/30
+OnCalendar=*:0/15
 Persistent=true
 
 [Install]
