@@ -5,12 +5,12 @@
     // "width": 1280, // Waybar width
     "spacing": 4, // Gaps between modules (4px)
     // Choose the order of the modules
-    "modules-left": ["sway/workspaces"],
+    "modules-left": ["sway/workspaces", "tray"],
     "modules-center": ["sway/window"],
 {{- if .is_laptop }}
-    "modules-right": ["custom/proxy", "pulseaudio", "network", "backlight", "sway/language", "battery", "battery#bat2", "clock", "tray"],
+    "modules-right": ["custom/proxy", "pulseaudio", "network", "backlight", "sway/language", "battery", "battery#bat2", "clock"],
 {{- else }}
-    "modules-right": ["custom/proxy", "pulseaudio", "network", "sway/language", "clock", "tray"],
+    "modules-right": ["custom/proxy", "pulseaudio", "network", "sway/language", "clock"],
 {{- end }}
     // Modules configuration
     // "sway/workspaces": {
@@ -86,7 +86,7 @@
         "spacing": 10
     },
     "clock": {
-        "format": "{:%H:%M  %a %d.%m}",
+        "format": "{:%d.%m  <span color=\"#88c0d0\">%H:%M</span>}",
         "format-alt": "{:%Y-%m-%d %H:%M:%S}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
