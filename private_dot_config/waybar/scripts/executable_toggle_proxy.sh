@@ -17,10 +17,11 @@ else
     gsettings set org.gnome.system.proxy.http port "$PROXY_PORT"
     gsettings set org.gnome.system.proxy.https host "$PROXY_HOST"
     gsettings set org.gnome.system.proxy.https port "$PROXY_PORT"
+    gsettings set org.gnome.system.proxy ignore-hosts "['localhost', '127.0.0.1', '10.*', '192.168.*', '*.lan']"
 
     export HTTP_PROXY="$PROXY_URL" HTTPS_PROXY="$PROXY_URL"
     export http_proxy="$PROXY_URL" https_proxy="$PROXY_URL"
-    export NO_PROXY="localhost,127.0.0.1,10.0.0.0/16,192.168.0.0/16" no_proxy="localhost,127.0.0.1,10.0.0.0/16,192.168.0.0/16"
+    export NO_PROXY="localhost,127.0.0.1,10.0.0.0/16,192.168.0.0/16,.lan" no_proxy="localhost,127.0.0.1,10.0.0.0/16,192.168.0.0/16,.lan"
     dbus-update-activation-environment --systemd HTTP_PROXY HTTPS_PROXY http_proxy https_proxy NO_PROXY no_proxy
 fi
 
