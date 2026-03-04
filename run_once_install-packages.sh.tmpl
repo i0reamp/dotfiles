@@ -1,0 +1,40 @@
+#!/bin/bash
+# chezmoi:template: leftDelimiter={{, rightDelimiter=}}
+# Bootstrap: install required packages
+
+set -euo pipefail
+
+{{ if eq .chezmoi.os "linux" -}}
+{{ if or (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "debian") -}}
+
+install_if_missing() {
+    if ! command -v "$1" &>/dev/null; then
+        echo "Installing $2..."
+        $3
+    else
+        echo "$1 already installed"
+    fi
+}
+
+# sing-box
+if ! command -v sing-box &>/dev/null; then
+    echo "Installing sing-box..."
+    sudo mkdir -p /etc/apt/keyrings
+    curl -fsSL https://sing-box.app/gpg.key | sudo tee /etc/apt/keyrings/sagernet.asc >/dev/null
+    sudo chmod a+r /etc/apt/keyrings/sagernet.asc
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/sagernet.asc] https://deb.sagernet.org/ * *" | sudo tee /etc/apt/sources.list.d/sagernet.list >/dev/null
+    sudo apt-get update -qq -o Dir::Etc::sourcelist=/etc/apt/sources.list.d/sagernet.list -o Dir::Etc::sourceparts=/dev/null
+    sudo apt-get install -y -qq sing-box
+else
+    echo "sing-box already installed"
+fi
+
+# Other packages
+for pkg in rofi grim slurp wl-copy swaylock swayidle waybar brightnessctl wlsunset; do
+    if ! command -v "$pkg" &>/dev/null; then
+        sudo apt-get install -y -qq "$pkg" 2>/dev/null || echo "Warning: $pkg not found in repos"
+    fi
+done
+
+{{ end -}}
+{{ end -}}

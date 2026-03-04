@@ -1,0 +1,43 @@
+{
+  "log": {
+    "level": "warn"
+  },
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "proxy-in",
+      "listen": "127.0.0.1",
+      "listen_port": 10488
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "vless",
+      "tag": "vless-out",
+      "server": "{{ .singbox_server }}",
+      "server_port": {{ .singbox_port }},
+      "uuid": "{{ .singbox_uuid }}",
+      "flow": "xtls-rprx-vision",
+      "tls": {
+        "enabled": true,
+        "server_name": "{{ .singbox_sni }}",
+        "reality": {
+          "enabled": true,
+          "public_key": "{{ .singbox_public_key }}",
+          "short_id": "{{ .singbox_short_id }}"
+        },
+        "utls": {
+          "enabled": true,
+          "fingerprint": "{{ .singbox_fingerprint }}"
+        }
+      }
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ],
+  "route": {
+    "auto_detect_interface": true
+  }
+}
