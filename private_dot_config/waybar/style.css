@@ -1,82 +1,156 @@
 /* =============================================================================
  *
- * Waybar styles
- *
- * Styles reference: https://github.com/Alexays/Waybar/wiki/Configuration
+ * Waybar styles — modern dark pills theme
  *
  * =========================================================================== */
 
-/* -----------------------------------------------------------------------------
- * Keyframes
- * -------------------------------------------------------------------------- */
+/* --- Keyframes ----------------------------------------------------------- */
 
 @keyframes blink-warning {
-    70% {
-        color: white;
-    }
-
-    to {
-        color: white;
-        background-color: orange;
-    }
+    0%   { color: #e89048; }
+    50%  { color: white; }
+    100% { color: #e89048; }
 }
 
 @keyframes blink-critical {
-    70% {
-      color: white;
-    }
-
-    to {
-        color: white;
-        background-color: red;
-    }
+    0%   { color: #ff5555; }
+    50%  { color: white; }
+    100% { color: #ff5555; }
 }
 
+/* --- Reset --------------------------------------------------------------- */
 
-/* -----------------------------------------------------------------------------
- * Base styles
- * -------------------------------------------------------------------------- */
-
-/* Reset all styles */
 * {
     border: none;
     border-radius: 0;
     min-height: 0;
     margin: 0;
     padding: 0;
-}
-
-/* The whole bar */
-#waybar {
-    background-color: #222222; /* Sway palette: unfocused/background */
-    color: #ffffff; /* Sway palette: focused/text */
-    font-family: Terminus, FontAwesome, "Symbols Nerd Font", system-ui, sans-serif;
+    font-family: Terminus, "Symbols Nerd Font", FontAwesome, system-ui, sans-serif;
     font-size: 14px;
 }
 
-/* -----------------------------------------------------------------------------
- * Module styles
- * -------------------------------------------------------------------------- */
+/* --- Bar ----------------------------------------------------------------- */
 
-/* Each module */
-#backlight,
-#battery,
-#clock,
-#cpu,
-#custom-keyboard-layout,
-#idle_inhibitor,
-#memory,
-#mode,
-#network,
+#waybar {
+    background-color: rgba(34, 34, 34, 0.92);
+    color: #ffffff;
+}
+
+/* --- Common module pill style -------------------------------------------- */
+
+#custom-vpn,
+#custom-proxy,
 #pulseaudio,
-#temperature,
-#tray {
-    margin-left: 10px;
+#network,
+#backlight,
+#language,
+#battery,
+#battery.bat2,
+#clock {
+    background-color: #333333;
+    border-radius: 8px;
+    padding: 0 10px;
+    margin: 4px 3px;
+    min-width: 20px;
 }
 
-#backlight {
-    /* No styles */
+/* --- Workspaces ---------------------------------------------------------- */
+
+#workspaces button {
+    padding: 0 6px;
+    margin: 4px 1px;
+    border-radius: 6px;
+    color: #888888;
+    transition: all 150ms ease-in-out;
 }
+
+#workspaces button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: inherit;
+    text-shadow: inherit;
+    color: #cccccc;
+}
+
+#workspaces button.visible {
+    color: #ffffff;
+    background-color: #5f676a;
+}
+
+#workspaces button.focused {
+    color: #ffffff;
+    background-color: #285577;
+    border-bottom: 2px solid #4c7899;
+}
+
+#workspaces button.urgent {
+    color: #ffffff;
+    background-color: #900000;
+}
+
+/* --- Tray ---------------------------------------------------------------- */
+
+#tray {
+    margin-left: 6px;
+}
+
+/* --- Window title -------------------------------------------------------- */
+
+#window {
+    margin-left: 32px;
+    margin-right: 32px;
+    color: #999999;
+}
+
+/* --- Mode ---------------------------------------------------------------- */
+
+#mode {
+    color: #ffffff;
+    background-color: #900000;
+    border-radius: 8px;
+    padding: 0 16px;
+    margin: 4px 3px;
+}
+
+/* --- Clock --------------------------------------------------------------- */
+
+#clock {
+    padding: 0 12px;
+}
+
+/* --- VPN ----------------------------------------------------------------- */
+
+#custom-vpn.connected {
+    color: #32cd32;
+}
+
+#custom-vpn.disconnected {
+    color: #ff5555;
+}
+
+/* --- Proxy --------------------------------------------------------------- */
+
+#custom-proxy.on {
+    color: #32cd32;
+}
+
+#custom-proxy.off {
+    color: #888888;
+}
+
+/* --- Network ------------------------------------------------------------- */
+
+#network.disconnected {
+    color: #e89048;
+}
+
+/* --- Pulseaudio ---------------------------------------------------------- */
+
+#pulseaudio.muted {
+    color: #888888;
+}
+
+/* --- Battery ------------------------------------------------------------- */
 
 #battery {
     animation-timing-function: linear;
@@ -85,11 +159,11 @@
 }
 
 #battery.warning {
-    color: orange;
+    color: #e89048;
 }
 
 #battery.critical {
-    color: red;
+    color: #ff5555;
 }
 
 #battery.warning.discharging {
@@ -102,124 +176,12 @@
     animation-duration: 2s;
 }
 
-#clock {
-    /* No styles */
+#battery.charging {
+    color: #32cd32;
 }
 
-#clock.time {
-    min-width: 60px;
-    color: orange;
-}
-
-#cpu {
-  /* No styles */
-}
-
-#cpu.warning {
-    color: orange;
-}
-
-#cpu.critical {
-    color: red;
-}
-
-#custom-keyboard-layout {
-    margin-left: 22px;
-}
-
-#memory {
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-}
-
-#memory.warning {
-    color: orange;
-}
-
-#memory.critical {
-    color: red;
-    animation-name: blink-critical;
-    animation-duration: 2s;
-}
-
-#mode {
-    color: #ffffff; /* Sway palette: urgent/text */
-    background-color: #900000; /* Sway palette: urgent/background */
-    margin-left: 0;
-    /* To compensate for the top border and still have vertical centering */
-    padding: 0 16px;
-}
-
-#network {
-    /* No styles */
-}
-
-#network.disconnected {
-    color: orange;
-}
-
-#pulseaudio {
-    /* No styles */
-}
-
-#pulseaudio.muted {
-    /* No styles */
-}
-
-#temperature {
-    /* No styles */
-}
+/* --- Temperature --------------------------------------------------------- */
 
 #temperature.critical {
-    color: red;
+    color: #ff5555;
 }
-
-#tray {
-    /* No styles */
-}
-
-#window {
-    margin-left: 32px;
-    margin-right: 32px;
-}
-
-#workspaces button {
-    border-top: 2px solid transparent;
-    /* To compensate for the top border and still have vertical centering */
-    padding-bottom: 2px;
-    padding-left: 5px;
-    padding-right: 5px;
-    color: #888888; /* Sway palette: unfocused/text */
-}
-
-#workspaces button:hover {
-    /* Reset all hover styles */
-    background: inherit;
-    box-shadow: inherit;
-    text-shadow: inherit;
-}
-
-#workspaces button.visible {
-    border-color: #333333; /* Sway palette focused_inactive/border */
-    color: #ffffff; /* Sway palette: focused_inactive/text */
-    background-color: #5f676a; /* Sway palette focused_inactive/background */
-}
-
-#workspaces button.focused {
-    border-color: #4c7899; /* Sway palette: focused/border */
-    color: #ffffff; /* Sway palette: focused/text */
-    background-color: #285577; /* Sway palette: focused/background */
-}
-
-#workspaces button.urgent {
-    border-color: #2f343a; /* Sway palette: urgent/border */
-    color: #ffffff; /* Sway palette: urgent/text */
-    background-color: #900000; /* Sway palette: urgent/background */
-}
-
-#custom-vpn.connected     { color: #32cd32; }   /* зелёный */
-#custom-vpn.disconnected  { color: #ff5555; }   /* красный */
-
-#custom-proxy.on          { color: #32cd32; margin-left: 10px; margin-right: 4px; }
-#custom-proxy.off         { color: #888888; margin-left: 10px; margin-right: 4px; }
