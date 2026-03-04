@@ -8,9 +8,9 @@
     "modules-left": ["sway/workspaces", "tray"],
     "modules-center": ["sway/window"],
 {{- if .is_laptop }}
-    "modules-right": ["custom/proxy", "pulseaudio", "network", "backlight", "sway/language", "battery", "battery#bat2", "clock"],
+    "modules-right": ["custom/vpn", "custom/proxy", "pulseaudio", "network", "backlight", "sway/language", "battery", "battery#bat2", "clock"],
 {{- else }}
-    "modules-right": ["custom/proxy", "pulseaudio", "network", "sway/language", "clock"],
+    "modules-right": ["custom/vpn", "custom/proxy", "pulseaudio", "network", "sway/language", "clock"],
 {{- end }}
     // Modules configuration
     // "sway/workspaces": {
@@ -152,6 +152,15 @@
             "default": ["", "", ""]
         },
         "on-click": "pavucontrol"
+    },
+    "custom/vpn": {
+        "exec": "~/.config/waybar/scripts/vpn_status.sh",
+        "return-type": "json",
+        "interval": 30,
+        "signal": 10,
+        "format": "{}",
+        "tooltip": true,
+        "on-click": "~/.config/waybar/scripts/vpn_toggle.sh"
     },
     "custom/proxy": {
         "exec": "~/.config/waybar/scripts/proxy_status.sh",

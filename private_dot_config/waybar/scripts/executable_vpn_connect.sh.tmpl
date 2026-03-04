@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+OTP=$(oathtool -b --totp '{{ .vpn_otp_secret }}')
+ip-client SETRADIUSINFO {{ .vpn_login }} "$OTP"
+sleep 1
+ip-client CONNECT {{ .vpn_pin }}
+
+pkill -SIGRTMIN+10 waybar
