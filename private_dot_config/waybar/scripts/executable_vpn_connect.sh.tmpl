@@ -5,4 +5,8 @@ ip-client SETRADIUSINFO {{ .vpn_login }} "$OTP"
 sleep 1
 ip-client CONNECT {{ .vpn_pin }}
 
+# Set Amicon DNS when VPN is up
+sudo resolvectl dns global 192.168.0.1
+sudo resolvectl domain global ~.
+
 pkill -SIGRTMIN+10 waybar
