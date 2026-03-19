@@ -38,9 +38,9 @@ exec ~/.config/sway/scripts/wallpaper.sh
 # Example configuration:
 #
 exec swayidle -w \
-         timeout 300 'swaylock -f -c 000000' \
+         timeout 300 'swaymsg "input type:keyboard xkb_switch_layout 0" && swaylock -f -c 000000' \
          timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
-         before-sleep 'swaylock -f -c 000000'
+         before-sleep 'swaymsg "input type:keyboard xkb_switch_layout 0" && swaylock -f -c 000000'
 #
 # This will lock your screen after 300 seconds of inactivity, then turn off
 # your displays after another 300 seconds, and turn your screens back on when
@@ -197,8 +197,8 @@ mode "resize" {
 #
 bindsym --to-code Print exec 'grim -g "$(slurp)" - | wl-copy'
 bindsym --to-code Shift+Print exec 'grim - | wl-copy'
-bindsym --to-code $mod+Print exec 'grim -g "$(slurp)" ~/screenshot_$(date +%Y%m%d_%H%M%S).png'
-bindsym --to-code $mod+Shift+Print exec 'grim ~/screenshot_$(date +%Y%m%d_%H%M%S).png'
+bindsym --to-code $mod+Print exec 'f=~/screenshot_$(date +%Y%m%d_%H%M%S).png && grim -g "$(slurp)" "$f" && echo -n "$f" | wl-copy'
+bindsym --to-code $mod+Shift+Print exec 'f=~/screenshot_$(date +%Y%m%d_%H%M%S).png && grim "$f" && echo -n "$f" | wl-copy'
 # bindsym --to-code $mod+r mode "resize"
 
 # Network manager
@@ -246,6 +246,8 @@ hide_edge_borders smart
 # Startup applications
 # exec --no-startup-id foot --server
 #
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
+exec systemctl --user restart xdg-desktop-portal xdg-desktop-portal-wlr
 exec --no-startup-id wlsunset -l 55.7 -L 37.6
 
 for_window [class="^.*"] border pixel 2

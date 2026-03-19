@@ -8,3 +8,5 @@ vim.g.snacks_animate = false
 vim.g.autoformat = false
 
 vim.o.tabstop = 8 -- A TAB character looks like 4 spaces
+vim.opt.spell = false
+vim.g.lazyvim_icons = false
