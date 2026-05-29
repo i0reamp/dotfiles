@@ -193,13 +193,13 @@ mode "resize" {
 #
 # Screenshots: Print = area to clipboard, Shift+Print = fullscreen to clipboard
 #              Mod+Print = area to file (path to clipboard), Mod+Shift+Print = fullscreen to file
-#              Mod+Alt+Print = area to swappy (annotate)
+#              Mod+Alt+Print = area to satty (annotate, copy with wl-copy)
 #
 bindsym --to-code Print exec 'grim -g "$(slurp)" - | wl-copy'
 bindsym --to-code Shift+Print exec 'grim - | wl-copy'
 bindsym --to-code $mod+Print exec 'f=~/screenshot_$(date +%Y%m%d_%H%M%S).png && grim -g "$(slurp)" "$f" && echo -n "$f" | wl-copy'
 bindsym --to-code $mod+Shift+Print exec 'f=~/screenshot_$(date +%Y%m%d_%H%M%S).png && grim "$f" && echo -n "$f" | wl-copy'
-bindsym --to-code $mod+Mod1+Print exec 'grim -g "$(slurp)" - | swappy -f -'
+bindsym --to-code $mod+Mod1+Print exec 'grim -g "$(slurp)" - | satty --filename - --copy-command wl-copy --early-exit'
 
 # Screen recording: Mod+Shift+R — toggle. 1st press: select region+record, 2nd: stop+save.
 bindsym --to-code $mod+Shift+r exec ~/.config/sway/scripts/record.sh
