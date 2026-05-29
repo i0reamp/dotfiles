@@ -14,31 +14,10 @@
     {
       "type": "urltest",
       "tag": "auto",
-      "outbounds": ["vless-ch", "vless-main", "vless-backup"],
+      "outbounds": ["vless-ch", "vless-backup"],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "1m0s",
       "tolerance": 50
-    },
-    {
-      "type": "vless",
-      "tag": "vless-main",
-      "server": "{{ .singbox_server }}",
-      "server_port": {{ .singbox_port }},
-      "uuid": "{{ .singbox_uuid }}",
-      "flow": "xtls-rprx-vision",
-      "tls": {
-        "enabled": true,
-        "server_name": "{{ .singbox_sni }}",
-        "reality": {
-          "enabled": true,
-          "public_key": "{{ .singbox_public_key }}",
-          "short_id": "{{ .singbox_short_id }}"
-        },
-        "utls": {
-          "enabled": true,
-          "fingerprint": "{{ .singbox_fingerprint }}"
-        }
-      }
     },
     {
       "type": "vless",

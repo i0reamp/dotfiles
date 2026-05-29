@@ -26,7 +26,7 @@
     min-height: 0;
     margin: 0;
     padding: 0;
-    font-family: Terminus, "Symbols Nerd Font", FontAwesome, system-ui, sans-serif;
+    font-family: Terminus, "Symbols Nerd Font", "Font Awesome 6 Free Solid", "Font Awesome 6 Free", "Font Awesome 6 Brands", FontAwesome, system-ui, sans-serif;
     font-size: 14px;
 }
 
