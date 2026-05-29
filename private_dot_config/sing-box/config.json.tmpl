@@ -12,8 +12,16 @@
   ],
   "outbounds": [
     {
+      "type": "urltest",
+      "tag": "auto",
+      "outbounds": ["vless-ch", "vless-main", "vless-backup"],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "1m0s",
+      "tolerance": 50
+    },
+    {
       "type": "vless",
-      "tag": "vless-out",
+      "tag": "vless-main",
       "server": "{{ .singbox_server }}",
       "server_port": {{ .singbox_port }},
       "uuid": "{{ .singbox_uuid }}",
@@ -33,11 +41,82 @@
       }
     },
     {
+      "type": "vless",
+      "tag": "vless-backup",
+      "server": "v1142586.hosted-by-vdsina.ru",
+      "server_port": 40920,
+      "uuid": "c493f4ba-a039-404f-be39-90c647a90142"
+    },
+    {
+      "type": "vless",
+      "tag": "vless-ch",
+      "server": "179.43.152.210",
+      "server_port": 443,
+      "uuid": "26142830-44c2-4d62-84c0-d489dc64a87b",
+      "flow": "xtls-rprx-vision",
+      "tls": {
+        "enabled": true,
+        "server_name": "sw.denditop.site",
+        "reality": {
+          "enabled": true,
+          "public_key": "wgoLhL4pRP0y6fu6He4qW_ElohCM_ANWJF3HEoUhNz4",
+          "short_id": "9c2378562188c3cb"
+        },
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
       "type": "direct",
       "tag": "direct"
     }
   ],
   "route": {
-    "auto_detect_interface": true
+    "auto_detect_interface": true,
+    "rule_set": [
+      {
+        "tag": "proxy-list",
+        "type": "local",
+        "format": "source",
+        "path": "{{ .chezmoi.homeDir }}/.config/sing-box/proxy-domains.json"
+      },
+      {
+        "tag": "refilter-domains",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://github.com/1andrevich/Re-filter-lists/releases/latest/download/ruleset-domain-refilter_domains.srs",
+        "download_detour": "direct",
+        "update_interval": "1d"
+      },
+      {
+        "tag": "refilter-ips",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://github.com/1andrevich/Re-filter-lists/releases/latest/download/ruleset-ip-refilter_ipsum.srs",
+        "download_detour": "direct",
+        "update_interval": "1d"
+      },
+      {
+        "tag": "geoblock-ru",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://github.com/itdoginfo/allow-domains/releases/latest/download/geoblock.srs",
+        "download_detour": "direct",
+        "update_interval": "1d"
+      }
+    ],
+    "rules": [
+      {"action": "sniff"},
+      {"rule_set": ["proxy-list", "refilter-domains", "refilter-ips", "geoblock-ru"], "outbound": "auto"}
+    ],
+    "final": "direct"
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true,
+      "path": "{{ .chezmoi.homeDir }}/.config/sing-box/cache.db"
+    }
   }
 }

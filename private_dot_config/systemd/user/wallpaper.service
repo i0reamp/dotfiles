@@ -1,6 +1,0 @@
-[Unit]
-Description=Change wallpaper from Unsplash
-
-[Service]
-Type=oneshot
-ExecStart=%h/.config/sway/scripts/wallpaper.sh

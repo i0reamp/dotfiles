@@ -29,12 +29,36 @@ else
     echo "sing-box already installed"
 fi
 
-# Other packages
+# Core packages
 for pkg in rofi grim slurp wl-copy swaylock swayidle waybar brightnessctl wlsunset; do
     if ! command -v "$pkg" &>/dev/null; then
         sudo apt-get install -y -qq "$pkg" 2>/dev/null || echo "Warning: $pkg not found in repos"
     fi
 done
+
+# CLI tools
+for pkg in ripgrep fd-find bat jq yq fzf tree htop cliphist sshfs; do
+    dpkg -s "${pkg}" &>/dev/null || sudo apt-get install -y -qq "$pkg" 2>/dev/null || echo "Warning: $pkg not found"
+done
+# symlinks for Ubuntu-renamed binaries
+[ -x /usr/bin/fdfind ] && ln -sf /usr/bin/fdfind ~/.local/bin/fd 2>/dev/null
+[ -x /usr/bin/batcat ] && ln -sf /usr/bin/batcat ~/.local/bin/bat 2>/dev/null
+
+# Screenshot OCR
+for pkg in tesseract-ocr tesseract-ocr-rus; do
+    dpkg -s "$pkg" &>/dev/null || sudo apt-get install -y -qq "$pkg" 2>/dev/null
+done
+
+# Autotiling for sway
+if ! command -v autotiling &>/dev/null; then
+    pip3 install --user --break-system-packages autotiling 2>/dev/null || true
+fi
+
+# Wayland screen sharing portal
+dpkg -s xdg-desktop-portal-wlr &>/dev/null || sudo apt-get install -y -qq xdg-desktop-portal-wlr 2>/dev/null
+
+# PipeWire audio utils
+dpkg -s pulseaudio-utils &>/dev/null || sudo apt-get install -y -qq pulseaudio-utils 2>/dev/null
 
 {{ end -}}
 {{ end -}}

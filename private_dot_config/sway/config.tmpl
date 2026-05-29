@@ -24,8 +24,7 @@ font pango:Terminus Regular 12
 # Default wallpaper (more resolutions are available in /gnu/store/cg5y58k8069z4v1ik9bdr746549ycjyg-sway-1.6.1/share/backgrounds/sway/)
 # output * bg ~/personal/guix-config/config/wallpaper/0001.svg fill
 # output * bg ~/personal/guix-config/config/wallpaper/z.jpg fill
-#output * bg ~/personal/guix-config/config/wallpaper/bbc.jpg fill
-exec ~/.config/sway/scripts/wallpaper.sh
+output * bg ~/Pictures/wallpaper.png fill
 #
 # Example configuration:
 #
@@ -38,8 +37,8 @@ exec ~/.config/sway/scripts/wallpaper.sh
 # Example configuration:
 #
 exec swayidle -w \
-         timeout 300 'swaymsg "input type:keyboard xkb_switch_layout 0" && swaylock -f -c 000000' \
-         timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
+         timeout 300 '~/.config/sway/scripts/maybe-lock.sh' \
+         timeout 600 '~/.config/sway/scripts/maybe-dpms-off.sh' resume 'swaymsg "output * dpms on"' \
          before-sleep 'swaymsg "input type:keyboard xkb_switch_layout 0" && swaylock -f -c 000000'
 #
 # This will lock your screen after 300 seconds of inactivity, then turn off
@@ -52,7 +51,7 @@ input type:keyboard {
   xkb_layout "us,ru"
   xkb_options caps:ctrl,grp:alt_shift_toggle,compose:menu
   repeat_delay 250
-  repeat_rate 50
+  repeat_rate 30
 }
 
 ### Key bindings
@@ -193,12 +192,17 @@ mode "resize" {
 }
 #
 # Screenshots: Print = area to clipboard, Shift+Print = fullscreen to clipboard
-#              Mod+Print = area to file, Mod+Shift+Print = fullscreen to file
+#              Mod+Print = area to file (path to clipboard), Mod+Shift+Print = fullscreen to file
+#              Mod+Alt+Print = area to swappy (annotate)
 #
 bindsym --to-code Print exec 'grim -g "$(slurp)" - | wl-copy'
 bindsym --to-code Shift+Print exec 'grim - | wl-copy'
 bindsym --to-code $mod+Print exec 'f=~/screenshot_$(date +%Y%m%d_%H%M%S).png && grim -g "$(slurp)" "$f" && echo -n "$f" | wl-copy'
 bindsym --to-code $mod+Shift+Print exec 'f=~/screenshot_$(date +%Y%m%d_%H%M%S).png && grim "$f" && echo -n "$f" | wl-copy'
+bindsym --to-code $mod+Mod1+Print exec 'grim -g "$(slurp)" - | swappy -f -'
+
+# Screen recording: Mod+Shift+R — toggle. 1st press: select region+record, 2nd: stop+save.
+bindsym --to-code $mod+Shift+r exec ~/.config/sway/scripts/record.sh
 # bindsym --to-code $mod+r mode "resize"
 
 # Network manager
@@ -209,9 +213,6 @@ bindsym --to-code $mod+g exec firefox
 
 # telegram
 bindsym --to-code $mod+t exec flatpak run org.telegram.desktop
-
-# wallpaper
-bindsym --to-code $mod+Shift+w exec ~/.config/sway/scripts/wallpaper.sh
 
 # Brightness (laptop only)
 bindsym --to-code XF86MonBrightnessUp exec --no-startup-id brightnessctl set +10%
@@ -228,6 +229,12 @@ bindsym --to-code $mod+f10 exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
 bindsym --to-code $mod+Shift+s exec killall -SIGUSR1 waybar
 
 bindsym --to-code $mod+Shift+v exec "~/.config/waybar/scripts/toggle_proxy.sh"
+
+# Clipboard history (Mod+c to pick, cliphist stores via wl-paste)
+bindsym --to-code $mod+c exec 'cliphist list | rofi -dmenu -p "Clipboard" | cliphist decode | wl-copy'
+
+# Screenshot OCR — select area, extract text to clipboard
+bindsym --to-code $mod+o exec 'grim -g "$(slurp)" - | tesseract -l rus+eng - - | wl-copy && notify-send "OCR" "Text copied to clipboard"'
 
 seat seat0 hide_cursor when-typing enable
 seat seat0 hide_cursor 20000
@@ -249,6 +256,8 @@ hide_edge_borders smart
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
 exec systemctl --user restart xdg-desktop-portal xdg-desktop-portal-wlr
 exec --no-startup-id wlsunset -l 55.7 -L 37.6
+exec --no-startup-id wl-paste --watch cliphist store
+exec --no-startup-id autotiling
 
 for_window [class="^.*"] border pixel 2
 
