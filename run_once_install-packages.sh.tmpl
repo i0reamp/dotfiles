@@ -1,64 +1,166 @@
 #!/bin/bash
 # chezmoi:template: leftDelimiter={{, rightDelimiter=}}
-# Bootstrap: install required packages
+# Bootstrap: install every system package this workstation depends on.
+# Idempotent — safe to re-run. Hash change re-fires chezmoi run-once.
 
 set -euo pipefail
 
 {{ if eq .chezmoi.os "linux" -}}
 {{ if or (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "debian") -}}
 
-install_if_missing() {
-    if ! command -v "$1" &>/dev/null; then
-        echo "Installing $2..."
-        $3
-    else
-        echo "$1 already installed"
+# ─────────────────────────────────────────────────────────────────────────────
+# helpers
+# ─────────────────────────────────────────────────────────────────────────────
+log()  { printf "\033[1;34m▸\033[0m %s\n" "$*"; }
+warn() { printf "\033[1;33m!\033[0m %s\n" "$*"; }
+
+apt_install_missing() {
+    local missing=()
+    local p
+    for p in "$@"; do
+        dpkg -s "$p" &>/dev/null || missing+=("$p")
+    done
+    if [ ${#missing[@]} -gt 0 ]; then
+        log "apt install: ${missing[*]}"
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "${missing[@]}" || \
+            warn "some packages failed: ${missing[*]}"
     fi
 }
 
-# sing-box
+# ─────────────────────────────────────────────────────────────────────────────
+# 3rd-party apt repos
+# ─────────────────────────────────────────────────────────────────────────────
+
+# sing-box (proxy/vpn router)
 if ! command -v sing-box &>/dev/null; then
-    echo "Installing sing-box..."
+    log "adding sing-box repo"
     sudo mkdir -p /etc/apt/keyrings
     curl -fsSL https://sing-box.app/gpg.key | sudo tee /etc/apt/keyrings/sagernet.asc >/dev/null
     sudo chmod a+r /etc/apt/keyrings/sagernet.asc
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/sagernet.asc] https://deb.sagernet.org/ * *" | sudo tee /etc/apt/sources.list.d/sagernet.list >/dev/null
-    sudo apt-get update -qq -o Dir::Etc::sourcelist=/etc/apt/sources.list.d/sagernet.list -o Dir::Etc::sourceparts=/dev/null
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/sagernet.asc] https://deb.sagernet.org/ * *" \
+        | sudo tee /etc/apt/sources.list.d/sagernet.list >/dev/null
+    sudo apt-get update -qq -o Dir::Etc::sourcelist=/etc/apt/sources.list.d/sagernet.list \
+                               -o Dir::Etc::sourceparts=/dev/null
     sudo apt-get install -y -qq sing-box
-else
-    echo "sing-box already installed"
 fi
 
-# Core packages
-for pkg in rofi grim slurp wl-copy swaylock swayidle waybar brightnessctl wlsunset; do
-    if ! command -v "$pkg" &>/dev/null; then
-        sudo apt-get install -y -qq "$pkg" 2>/dev/null || echo "Warning: $pkg not found in repos"
-    fi
-done
+# Node.js 22 LTS via NodeSource (needed for claude-code and npx tools)
+if ! command -v node &>/dev/null; then
+    log "adding NodeSource Node.js 22 repo"
+    curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+    sudo apt-get install -y -qq nodejs
+fi
 
-# CLI tools
-for pkg in ripgrep fd-find bat jq yq fzf tree htop cliphist sshfs; do
-    dpkg -s "${pkg}" &>/dev/null || sudo apt-get install -y -qq "$pkg" 2>/dev/null || echo "Warning: $pkg not found"
-done
-# symlinks for Ubuntu-renamed binaries
+# ─────────────────────────────────────────────────────────────────────────────
+# apt packages — curated by domain
+# ─────────────────────────────────────────────────────────────────────────────
+
+# wayland / sway compositor stack
+apt_install_missing \
+    sway swayidle swaylock waybar wlsunset wl-clipboard cliphist \
+    grim slurp rofi brightnessctl playerctl pamixer pavucontrol \
+    xdg-desktop-portal-wlr foot
+
+# audio + pipewire
+apt_install_missing \
+    pipewire pipewire-audio pipewire-pulse pipewire-libcamera \
+    wireplumber pulseaudio-utils
+
+# multimedia / camera / video
+apt_install_missing \
+    ffmpeg frei0r-plugins \
+    gstreamer1.0-tools gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
+    gstreamer1.0-plugins-ugly gstreamer1.0-vaapi gstreamer1.0-libcamera \
+    libva-dev v4l-utils v4l2loopback-dkms \
+    tesseract-ocr tesseract-ocr-rus \
+    python3-opencv python3-numpy python3-pil
+
+# terminal / shell tooling
+apt_install_missing \
+    fish tmux bat ripgrep fd-find fzf zoxide mc tree htop bpytop \
+    jq yq nano less
+
+# dev / build
+apt_install_missing \
+    build-essential cmake gdb git gh pkg-config \
+    autoconf automake libtool default-jdk-headless \
+    python3-pip linux-headers-generic
+
+# networking / vpn
+apt_install_missing \
+    openvpn network-manager-openvpn network-manager-pptp \
+    sshfs sshpass oathtool mtr-tiny tcpdump curl wget \
+    gnupg openssh-client age
+
+# power / hardware
+apt_install_missing \
+    powertop tlp tlp-rdw acpica-tools lm-sensors lshw lsof strace
+
+# archives
+apt_install_missing \
+    zip unzip p7zip-full
+
+# IPU6 camera kernel modules (best-effort — version-locked)
+KVER=$(uname -r)
+apt_install_missing "linux-modules-ipu6-${KVER}" 2>/dev/null || true
+apt_install_missing linux-modules-iwlwifi-oem-24.04 2>/dev/null || true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Ubuntu-renamed binaries — friendly symlinks
+# ─────────────────────────────────────────────────────────────────────────────
+mkdir -p ~/.local/bin
 [ -x /usr/bin/fdfind ] && ln -sf /usr/bin/fdfind ~/.local/bin/fd 2>/dev/null
 [ -x /usr/bin/batcat ] && ln -sf /usr/bin/batcat ~/.local/bin/bat 2>/dev/null
 
-# Screenshot OCR
-for pkg in tesseract-ocr tesseract-ocr-rus; do
-    dpkg -s "$pkg" &>/dev/null || sudo apt-get install -y -qq "$pkg" 2>/dev/null
-done
-
-# Autotiling for sway
+# ─────────────────────────────────────────────────────────────────────────────
+# pip user packages
+# ─────────────────────────────────────────────────────────────────────────────
 if ! command -v autotiling &>/dev/null; then
+    log "pip install autotiling"
     pip3 install --user --break-system-packages autotiling 2>/dev/null || true
 fi
 
-# Wayland screen sharing portal
-dpkg -s xdg-desktop-portal-wlr &>/dev/null || sudo apt-get install -y -qq xdg-desktop-portal-wlr 2>/dev/null
+# ─────────────────────────────────────────────────────────────────────────────
+# npm globals
+# ─────────────────────────────────────────────────────────────────────────────
+if ! command -v claude &>/dev/null; then
+    log "npm install -g @anthropic-ai/claude-code"
+    sudo npm install -g @anthropic-ai/claude-code 2>/dev/null || \
+        warn "claude-code install failed; try later"
+fi
 
-# PipeWire audio utils
-dpkg -s pulseaudio-utils &>/dev/null || sudo apt-get install -y -qq pulseaudio-utils 2>/dev/null
+# ─────────────────────────────────────────────────────────────────────────────
+# lazygit (GitHub release, not in apt)
+# ─────────────────────────────────────────────────────────────────────────────
+if ! command -v lazygit &>/dev/null; then
+    log "installing lazygit from GitHub"
+    LG_VER=$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest \
+             | grep -Po '"tag_name": "v\K[^"]*')
+    curl -fsSLo /tmp/lazygit.tgz \
+        "https://github.com/jesseduffield/lazygit/releases/download/v${LG_VER}/lazygit_${LG_VER}_Linux_x86_64.tar.gz"
+    tar -xzf /tmp/lazygit.tgz -C /tmp lazygit
+    sudo install /tmp/lazygit /usr/local/bin/lazygit
+    rm -f /tmp/lazygit.tgz /tmp/lazygit
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# summary — list anything still missing
+# ─────────────────────────────────────────────────────────────────────────────
+MISSING_CMDS=()
+for c in sway swayidle swaylock waybar wlsunset wl-copy cliphist grim slurp \
+         rofi brightnessctl playerctl pamixer pavucontrol foot \
+         ffmpeg tesseract gst-launch-1.0 v4l2-ctl \
+         fish tmux bat rg fd fzf zoxide mc jq yq htop \
+         git gh node npm claude lazygit \
+         openvpn sshfs oathtool mtr powertop sing-box age; do
+    command -v "$c" &>/dev/null || MISSING_CMDS+=("$c")
+done
+
+if [ ${#MISSING_CMDS[@]} -gt 0 ]; then
+    warn "still missing after install pass: ${MISSING_CMDS[*]}"
+else
+    log "all expected tools present ✓"
+fi
 
 {{ end -}}
 {{ end -}}
